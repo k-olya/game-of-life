@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game of Life</title>
+    <link rel="stylesheet" href="styles.out.css" />
+  </head>
+  <body>
+    <canvas id="canvas" class="w-screen h-screen cursor-crosshair"></canvas>
+    <div
+      id="controls"
+      class="fixed top-0 right-0 bg-gray-700 text-white font-mono bg-opacity-50 p-4 rounded-sm"
+    >
+      <p>Разрешение:</p>
+      <div class="flex w-full space-x-2 mb-2">
+        <div id="widthDiv" class="w-10 text-center">38</div>
+        <input type="range" id="widthInput" min="12" max="46" value="20" />
+      </div>
+      <p>Время смены поколений:</p>
+      <div class="flex w-full space-x-2 mb-2">
+        <div id="timeDiv" class="w-10 text-center">250</div>
+        <input type="range" id="timeInput" min="0" max="2000" value="250" />
+      </div>
+      <p>Среднее время:</p>
+      <div class="flex w-full space-x-2 mb-3">
+        <div id="performanceDiv" class="text-center px-2">
+          <i class="text-xs">нужно 100 поколений...</i>
+        </div>
+      </div>
+      <div class="flex w-full space-x-2 justify-evenly">
+        <button
+          id="randomButton"
+          class="cursor-pointer bg-gray-600 rounded bg-opacity-50 hover:bg-opacity-75 p-2"
+        >
+          <img src="random.svg" class="w-6 h-6" />
+        </button>
+        <button
+          id="playButton"
+          style="display: none"
+          class="cursor-pointer bg-emerald-400 rounded bg-opacity-50 hover:bg-opacity-75 p-2"
+        >
+          <img src="play.svg" class="w-6 h-6" />
+        </button>
+        <button
+          id="pauseButton"
+          class="cursor-pointer bg-gray-600 rounded bg-opacity-50 hover:bg-opacity-75 p-2"
+        >
+          <img src="pause.svg" class="w-6 h-6" />
+        </button>
+        <button
+          id="clearButton"
+          class="cursor-pointer bg-gray-600 rounded bg-opacity-50 hover:bg-opacity-75 p-2"
+        >
+          <img src="clear.svg" class="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+    <script src="math.js"></script>
+    <script src="gl-utils.js"></script>
+    <script src="shaders.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
