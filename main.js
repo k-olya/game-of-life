@@ -105,14 +105,25 @@ let mousey = 0;
 let mouseButton = 0;
 let paused = false;
 let aspectRatio;
-let performanceLoops = 0;
-let performanceSum = 0;
-let performanceStart, performanceEnd;
+let frameCounter = 0;
+let secondStartTime = 0;
 
 // render loop
 function renderLoop(time) {
   // request the next frame
   requestAnimationFrame(renderLoop);
+
+  // update frame counter
+  frameCounter++;
+  if (!secondStartTime) {
+    secondStartTime = time;
+  }
+  if (time - secondStartTime >= 1000.0) {
+    performanceDiv.innerHTML =
+      ((frameCounter / (time - secondStartTime)) * 1000.0).toFixed(2) + "fps";
+    frameCounter = 0;
+    secondStartTime = time;
+  }
 
   const delta = time - prevTime;
 
@@ -122,7 +133,6 @@ function renderLoop(time) {
     prevTime = time;
 
     // draw game of life and measure performance
-    performanceStart = performance.now();
     gl.useProgram(morphProgram);
     gl.uniform2f(morphUniforms.u_resolution, options.width, options.height);
     gl.uniform1i(morphUniforms.u_texture_last, nextTexture);
@@ -132,15 +142,6 @@ function renderLoop(time) {
       options.height,
       nextTexture === 0 ? texture1Framebuffer : texture0Framebuffer
     );
-    performanceEnd = performance.now();
-    performanceSum += performanceEnd - performanceStart;
-    performanceLoops++;
-
-    if (performanceLoops >= 100) {
-      performanceDiv.innerHTML =
-        (performanceSum / performanceLoops).toFixed(3) + "ms";
-      performanceSum = performanceLoops = 0;
-    }
 
     nextTexture = Number(!nextTexture);
     t1 = nextTexture;
