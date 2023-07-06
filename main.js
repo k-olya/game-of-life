@@ -1,6 +1,6 @@
 var options = {
-  width: 38,
-  height: 38,
+  width: 64,
+  height: 64,
   generationLifetime: 250,
 };
 
@@ -8,6 +8,11 @@ var options = {
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 var gl = canvas.getContext("webgl");
+
+// set maximum texture resolution to 4096 or as high as device supports
+var maxWidth = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE), 4096);
+widthInput.max = Math.log2(maxWidth);
+widthDiv.innerHTML = options.width;
 
 // Create shaders
 var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
@@ -175,8 +180,8 @@ function renderLoop(time) {
 
 // resize canvas with window
 function resizeWindow() {
-  canvas.height = window.innerHeight * window.devicePixelRatio;
-  canvas.width = window.innerWidth * window.devicePixelRatio;
+  canvas.height = window.innerHeight; // *  window.devicePixelRatio;
+  canvas.width = window.innerWidth; // * window.devicePixelRatio;
   aspectRatio = canvas.width / canvas.height;
 }
 
@@ -188,7 +193,7 @@ function resizeGame(e) {
   let v = parseInt(e.target.value);
 
   // use logarithmic scale
-  v = Math.floor(Math.pow(1.2, v));
+  v = Math.floor(Math.pow(2, v));
 
   // resizing texture 0
   var newTextureFramebuffer = gl.createFramebuffer();
@@ -337,9 +342,17 @@ function mousemove(e) {
   mousex = Math.floor(mpx * options.width);
   mousey = Math.floor(mpy * options.height);
 }
+function dblclick(e) {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    document.documentElement.requestFullscreen();
+  }
+}
 canvas.addEventListener("mousedown", mousedown);
 canvas.addEventListener("mouseup", mouseup);
 canvas.addEventListener("mousemove", mousemove);
+canvas.addEventListener("dblclick", dblclick);
 function contextMenu(e) {
   if (
     !(e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) &&
@@ -351,6 +364,26 @@ function contextMenu(e) {
   return true;
 }
 window.oncontextmenu = contextMenu;
+
+// touch controls
+function touchstart(e) {
+  mouseButton = 1;
+  pause();
+}
+function touchend(e) {
+  mouseButton = 0;
+}
+function touchmove(e) {
+  console.log(e);
+  mousemove({
+    buttons: 1,
+    clientX: e.touches[0].clientX,
+    clientY: e.touches[0].clientY,
+  });
+}
+canvas.addEventListener("touchstart", touchstart);
+canvas.addEventListener("touchend", touchend);
+canvas.addEventListener("touchmove", touchmove);
 
 // Start the render loop
 renderLoop();
