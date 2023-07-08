@@ -61,7 +61,9 @@ var renderUniforms = getUniformLocations(
   "u_resolution",
   "u_screen_resolution",
   "u_texture_last",
-  "u_texture_next"
+  "u_texture_next",
+  "u_offset",
+  "u_scale"
 );
 
 // Create vertex buffers and bind them to respective programs
@@ -107,6 +109,9 @@ let paused = false;
 let aspectRatio;
 let frameCounter = 0;
 let secondStartTime = 0;
+let scale = 1.0;
+let offsetx = 0;
+let offsety = 0;
 
 // render loop
 function renderLoop(time) {
@@ -174,6 +179,10 @@ function renderLoop(time) {
   gl.uniform2f(renderUniforms.u_resolution, options.width, options.height);
   gl.uniform1i(renderUniforms.u_texture_last, t1);
   gl.uniform1i(renderUniforms.u_texture_next, t0);
+
+  gl.uniform2f(renderUniforms.u_offset, offsetx, offsety);
+  gl.uniform1f(renderUniforms.u_scale, scale);
+
   gl.uniform1f(renderUniforms.u_time, delta / options.generationLifetime);
   // draw
   fillFramebuffer(gl, canvas.width, canvas.height);
@@ -365,6 +374,13 @@ function contextMenu(e) {
   return true;
 }
 window.oncontextmenu = contextMenu;
+
+// mouse wheel
+function mwheel(e) {
+  let d = e.deltaY < 0 ? 1.5 : 0.66;
+  scale = clamp(scale * d, 8.0 / options.width, 1.0);
+}
+window.addEventListener("wheel", mwheel);
 
 // touch controls
 function touchstart(e) {

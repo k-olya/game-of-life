@@ -94,6 +94,8 @@ var renderShaderSource = `
     uniform sampler2D u_texture_last;
     uniform sampler2D u_texture_next;
     uniform float u_time;
+    uniform vec2 u_offset;
+    uniform float u_scale;
 
     void border(float w, vec2 st, vec4 color) {
         if (st.x < w) {
@@ -116,11 +118,15 @@ var renderShaderSource = `
         vec2 st = (gl_FragCoord.xy / u_screen_resolution - 0.5) * aspect + 0.5;
 
         // add a small padding
-        st = st * 1.02 - 0.01;
+        st = st * 1.04 - 0.02;
         
         if (st.x < 0.0 || st.x > 1.0 || st.y < 0.0 || st.y > 1.0) {
             discard;
         }
+        
+        // add scale and offset
+        st += u_offset;
+        st *= u_scale;
         
         vec2 rv = 0.35 / u_resolution;
         vec2 cv = (floor(st * u_resolution) + 0.5) / u_resolution;
@@ -132,7 +138,7 @@ var renderShaderSource = `
         c.a = 1.0;
 
         vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
-        float m = smoothstep(r + 0.004, r, l);
+        float m = smoothstep(r + 0.002 * u_scale, r, l);
         gl_FragColor = mix(zero, c, m);
         // border(0.0015, st, vec4(0.1, 0.1, 0.12, 1.0));
     }
