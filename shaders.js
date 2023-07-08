@@ -122,7 +122,7 @@ var renderShaderSource = `
             discard;
         }
         
-        vec2 rv = 0.42 / u_resolution;
+        vec2 rv = 0.35 / u_resolution;
         vec2 cv = (floor(st * u_resolution) + 0.5) / u_resolution;
         float r = min(rv.x, rv.y);
         float l = length(st - cv);
@@ -131,15 +131,9 @@ var renderShaderSource = `
         vec4 c = mix(last, next, clamp(u_time * 4.0, 0.0, 1.0));
         c.a = 1.0;
 
-
-        if (l < r ) {
-            gl_FragColor = c;
-        } else {
-            vec4 zero = vec4(0.0, 0.0, 0.0, 0.0);
-            c = mix(c, zero, clamp(512.0 * (l - r), 0.0, 1.0));
-            c.a = 1.0;
-            gl_FragColor = c;
-        }
+        vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
+        float m = smoothstep(r + 0.004, r, l);
+        gl_FragColor = mix(zero, c, m);
         // border(0.0015, st, vec4(0.1, 0.1, 0.12, 1.0));
     }
 `;
