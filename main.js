@@ -157,8 +157,8 @@ function renderLoop(time) {
     gl.uniform2f(mouseUniforms.u_resolution, options.width, options.height);
     gl.uniform2f(
       mouseUniforms.u_cursor_position,
-      Math.floor(mousex * scale),
-      Math.floor(mousey * scale)
+      Math.floor(fract(mousex * scale + offsetx) * options.width),
+      Math.floor(fract(mousey * scale + offsety) * options.height)
     );
     gl.uniform1i(mouseUniforms.u_mouse_button, mouseButton);
 
@@ -349,15 +349,24 @@ function mousemove(e) {
   }
   let x = e.clientX;
   let y = e.clientY;
+  if (e.buttons === 4) {
+    let deltax = x - prevx;
+    let deltay = y - prevy;
+    offsetx -= (deltax / innerWidth) * scale;
+    offsety += (deltay / innerHeight) * scale;
+    // console.log(offsetx, offsety);
+  }
+  prevx = x;
+  prevy = y;
   let aspectRatio = canvas.width / canvas.height;
   let aspectX = Math.max(aspectRatio, 1.0);
   let aspectY = Math.max(1.0 / aspectRatio, 1.0);
   let mpx = (x / canvas.width - 0.5) * aspectX + 0.5;
   let mpy = (y / canvas.height - 0.5) * aspectY + 0.5;
-  mpx = clamp(mpx * 1.02 - 0.01);
-  mpy = 1.0 - clamp(mpy * 1.02 - 0.01);
-  mousex = mpx * options.width;
-  mousey = mpy * options.height;
+  mpx = mpx - 0.5;
+  mpy = 0.5 - mpy;
+  mousex = mpx;
+  mousey = mpy;
 }
 function dblclick(e) {
   if (document.fullscreenElement) {

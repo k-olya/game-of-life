@@ -125,20 +125,26 @@ var renderShaderSource = `
         float aspectRatio = u_screen_resolution.x / u_screen_resolution.y;
         vec2 aspect = vec2(max(aspectRatio, 1.0), max(1.0 / aspectRatio, 1.0));
         vec2 st = (gl_FragCoord.xy / u_screen_resolution - 0.5) * aspect + 0.5;
+        vec2 z = st;
+        st -= 0.5;
+        float mask = rect(st, vec2(-0.5, -0.5), vec2(1., 1.));
         vec4 c = vec4(1.0, 1.0, 1.0, 1.0);
-        vec4 white = c;
         
         // add a small padding
-        st = st * 1.04 - 0.02;
+        //st = st * 1.04;
 
         // draw scrollbars
-        c *= rect(st, vec2(0.0, -0.01), vec2(1.0 * u_scale, 0.005))
-            + rect(st, vec2(-0.01, 0.0), vec2(0.005, 1.0 * u_scale));
+        c *= 0.25 * (rect(fract(z) - 0.5, vec2(-0.5 + fract(u_offset.x), -0.495), vec2(1.0 * u_scale, 0.0025))
+            + rect(fract(z) - 0.5, vec2(-0.495, -0.5 + fract(u_offset.y)), vec2(0.0025, 1.0 * u_scale)));
         c *= step(u_scale, 0.98);
+        c *= mask;
 
         // add scale and offset
-        st += u_offset;
         st *= u_scale;
+        st += u_offset;
+
+        // wrap arouond the edges
+        st = fract(st);
         
         vec2 rv = 0.4 / u_resolution;
         vec2 cv = (floor(st * u_resolution) + 0.5) / u_resolution;
@@ -152,7 +158,7 @@ var renderShaderSource = `
         vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
         float m = smoothstep(r + 0.002 * u_scale, r, l);
         circle = mix(zero, circle, m); // obtain final pixel color
-        circle *= rect(st, vec2(0.0, 0.), vec2(1., 1.));
+        circle *= mask;
 
         gl_FragColor = c + circle;
 

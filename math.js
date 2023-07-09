@@ -21,6 +21,10 @@ function lerp(a, b, t) {
 function clamp(x, min = 0.0, max = 1.0) {
   return Math.min(max, Math.max(min, x));
 }
+// extract fractional part
+function fract(x) {
+  return x - Math.floor(x);
+}
 
 // get random integer in the range [0, x)
 function irand(x) {
