@@ -152,10 +152,14 @@ function renderLoop(time) {
     nextTexture = Number(!nextTexture);
     t1 = nextTexture;
     t0 = Number(!nextTexture);
-  } else if (mouseButton > 0) {
+  } else if ([1, 2].includes(mouseButton)) {
     gl.useProgram(mouseProgram);
     gl.uniform2f(mouseUniforms.u_resolution, options.width, options.height);
-    gl.uniform2f(mouseUniforms.u_cursor_position, mousex, mousey);
+    gl.uniform2f(
+      mouseUniforms.u_cursor_position,
+      Math.floor(mousex * scale),
+      Math.floor(mousey * scale)
+    );
     gl.uniform1i(mouseUniforms.u_mouse_button, mouseButton);
 
     gl.uniform1i(mouseUniforms.u_texture_last, nextTexture);
@@ -352,8 +356,8 @@ function mousemove(e) {
   let mpy = (y / canvas.height - 0.5) * aspectY + 0.5;
   mpx = clamp(mpx * 1.02 - 0.01);
   mpy = 1.0 - clamp(mpy * 1.02 - 0.01);
-  mousex = Math.floor(mpx * options.width);
-  mousey = Math.floor(mpy * options.height);
+  mousex = mpx * options.width;
+  mousey = mpy * options.height;
 }
 function dblclick(e) {
   if (document.fullscreenElement) {

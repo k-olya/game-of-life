@@ -115,18 +115,27 @@ var renderShaderSource = `
         }
     }
 
+    float rect(vec2 st, vec2 xy, vec2 wh) {
+        float x = step(xy.x, st.x) * step(st.x, xy.x + wh.x);
+        float y = step(xy.y, st.y) * step(st.y, xy.y + wh.y);
+        return x * y;
+    }
+
     void main() {
         float aspectRatio = u_screen_resolution.x / u_screen_resolution.y;
         vec2 aspect = vec2(max(aspectRatio, 1.0), max(1.0 / aspectRatio, 1.0));
         vec2 st = (gl_FragCoord.xy / u_screen_resolution - 0.5) * aspect + 0.5;
-
+        vec4 c = vec4(1.0, 1.0, 1.0, 1.0);
+        vec4 white = c;
+        
         // add a small padding
         st = st * 1.04 - 0.02;
-        
-        if (st.x < 0.0 || st.x > 1.0 || st.y < 0.0 || st.y > 1.0) {
-            discard;
-        }
-        
+
+        // draw scrollbars
+        c *= rect(st, vec2(0.0, -0.01), vec2(1.0 * u_scale, 0.005))
+            + rect(st, vec2(-0.01, 0.0), vec2(0.005, 1.0 * u_scale));
+        c *= step(u_scale, 0.98);
+
         // add scale and offset
         st += u_offset;
         st *= u_scale;
@@ -137,12 +146,16 @@ var renderShaderSource = `
         float l = length(st - cv);
         vec4 last = texture2D(u_texture_last, st);
         vec4 next = texture2D(u_texture_next, st);
-        vec4 c = mix(last, next, clamp(u_time * 4.0, 0.0, 1.0));
-        c.a = 1.0;
+        vec4 circle = mix(last, next, clamp(u_time * 4.0, 0.0, 1.0));
+        circle.a = 1.0;
 
         vec4 zero = vec4(0.0, 0.0, 0.0, 1.0);
         float m = smoothstep(r + 0.002 * u_scale, r, l);
-        gl_FragColor = mix(zero, c, m);
+        circle = mix(zero, circle, m); // obtain final pixel color
+        circle *= rect(st, vec2(0.0, 0.), vec2(1., 1.));
+
+        gl_FragColor = c + circle;
+
         // border(0.0015, st, vec4(0.1, 0.1, 0.12, 1.0));
     }
 `;
