@@ -65,7 +65,7 @@ var mouseShaderSource = `
 `;
 
 // populates the field with random bits
-const randomAliveRatio = 0.25;
+const randomAliveRatio = 0.15;
 var randomShaderSource = `
     precision mediump float;
     uniform vec2 u_resolution;
@@ -74,7 +74,7 @@ var randomShaderSource = `
     // art of code's hash21: https://youtu.be/rvDo9LvfoVE
     float random (vec2 st) {
         st = fract(st * vec2(123.45, 456.78));
-        st += dot(st, st + u_seed * 420.0);
+        st += dot(st, st + u_seed * 42.0);
         return fract(st.x * st.y);
     }
     
