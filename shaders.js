@@ -71,8 +71,11 @@ var randomShaderSource = `
     uniform vec2 u_resolution;
     uniform float u_seed;
 
+    // art of code's hash21: https://youtu.be/rvDo9LvfoVE
     float random (vec2 st) {
-        return fract(sin(u_seed * dot(st.xy, vec2(12.98,78.233))) * 43712.0);
+        st = fract(st * vec2(123.45, 456.78));
+        st += dot(st, st + u_seed * 420.0);
+        return fract(st.x * st.y);
     }
     
     void main() {
@@ -128,7 +131,7 @@ var renderShaderSource = `
         st += u_offset;
         st *= u_scale;
         
-        vec2 rv = 0.35 / u_resolution;
+        vec2 rv = 0.4 / u_resolution;
         vec2 cv = (floor(st * u_resolution) + 0.5) / u_resolution;
         float r = min(rv.x, rv.y);
         float l = length(st - cv);

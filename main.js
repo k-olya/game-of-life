@@ -1,7 +1,7 @@
 var options = {
   width: 64,
   height: 64,
-  generationLifetime: 250,
+  generationLifetime: 125,
 };
 
 // set initial canvas size
@@ -13,6 +13,7 @@ var gl = canvas.getContext("webgl");
 var maxWidth = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE), 4096);
 widthInput.max = Math.log2(maxWidth);
 widthDiv.innerHTML = options.width;
+timeDiv.innerHTML = options.generationLifetime;
 
 // Create shaders
 var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
@@ -331,7 +332,9 @@ function mousedown(e) {
   if (!(e.ctrlKey || e.altKey || e.metaKey || e.shiftKey)) {
     mouseButton = e.buttons;
   }
-  pause();
+  if (e.buttons !== 4) {
+    pause();
+  }
 }
 function mouseup(e) {
   mouseButton = 0;
