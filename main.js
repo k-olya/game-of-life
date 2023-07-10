@@ -349,18 +349,18 @@ function mousemove(e) {
   }
   let x = e.clientX;
   let y = e.clientY;
+  let aspectRatio = canvas.width / canvas.height;
+  let aspectX = Math.max(aspectRatio, 1.0);
+  let aspectY = Math.max(1.0 / aspectRatio, 1.0);
   if (e.buttons === 4) {
     let deltax = x - prevx;
     let deltay = y - prevy;
-    offsetx -= (deltax / innerWidth) * scale;
-    offsety += (deltay / innerHeight) * scale;
+    offsetx -= (deltax / innerWidth) * scale * aspectX;
+    offsety += (deltay / innerHeight) * scale * aspectY;
     // console.log(offsetx, offsety);
   }
   prevx = x;
   prevy = y;
-  let aspectRatio = canvas.width / canvas.height;
-  let aspectX = Math.max(aspectRatio, 1.0);
-  let aspectY = Math.max(1.0 / aspectRatio, 1.0);
   let mpx = (x / canvas.width - 0.5) * aspectX + 0.5;
   let mpy = (y / canvas.height - 0.5) * aspectY + 0.5;
   mpx = mpx - 0.5;
